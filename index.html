@@ -4,785 +4,452 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Candida Score Calculator</title>
-<meta name="description" content="Candida Score calculator — Leon 2006 original and modified expanded versions with antifungal recommendations. ICU clinical decision support tool.">
-
-<!-- PWA -->
+<meta name="description" content="Candida Score — Leon 2006 and modified expanded versions with antifungal recommendations. ICU clinical decision support.">
 <meta name="theme-color" content="#0F6E56">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Candida Score">
 <link rel="manifest" href="manifest.json">
-
-<!-- Icons (Tabler) -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
-
 <style>
-  :root {
-    --bg: #F8F9FA;
-    --surface: #FFFFFF;
-    --border: #E2E6EA;
-    --border-light: #EEF0F2;
-    --text-primary: #1A1D23;
-    --text-secondary: #5A6170;
-    --text-tertiary: #9198A3;
-    --green: #1D9E75;
-    --green-bg: #E1F5EE;
-    --green-text: #0F6E56;
-    --amber: #BA7517;
-    --amber-bg: #FAEEDA;
-    --amber-text: #854F0B;
-    --red: #E24B4A;
-    --red-bg: #FCEBEB;
-    --red-text: #A32D2D;
-    --radius-sm: 8px;
-    --radius-md: 10px;
-    --radius-lg: 14px;
-    --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-  }
+:root{
+  --bg:#F8F9FA;--surface:#FFFFFF;--border:#E2E6EA;--border-l:#EEF0F2;
+  --tp:#1A1D23;--ts:#5A6170;--tt:#9198A3;
+  --green:#1D9E75;--gbg:#E1F5EE;--gt:#0F6E56;
+  --amber:#BA7517;--abg:#FAEEDA;--at:#854F0B;
+  --red:#E24B4A;--rbg:#FCEBEB;--rt:#A32D2D;
+  --r1:8px;--r2:10px;--r3:14px;
+  --font:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+}
+@media(prefers-color-scheme:dark){:root{
+  --bg:#111318;--surface:#1C1F26;--border:#2A2D35;--border-l:#222529;
+  --tp:#F0F1F3;--ts:#9198A3;--tt:#5A6170;
+  --gbg:#0D2B22;--gt:#4CC49A;--abg:#2A1F0A;--at:#E8A940;--rbg:#2A1010;--rt:#F07070;
+}}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--bg);color:var(--tp);min-height:100vh;-webkit-font-smoothing:antialiased}
+.wrap{max-width:680px;margin:0 auto;padding:24px 16px 60px}
 
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #111318;
-      --surface: #1C1F26;
-      --border: #2A2D35;
-      --border-light: #222529;
-      --text-primary: #F0F1F3;
-      --text-secondary: #9198A3;
-      --text-tertiary: #5A6170;
-      --green-bg: #0D2B22;
-      --green-text: #4CC49A;
-      --amber-bg: #2A1F0A;
-      --amber-text: #E8A940;
-      --red-bg: #2A1010;
-      --red-text: #F07070;
-    }
-  }
+/* Header */
+.hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.hdr h1{font-size:22px;font-weight:600;letter-spacing:-.3px}
+.hdr h1 span{color:var(--green)}
+.sub{font-size:13px;color:var(--ts);margin-bottom:20px;line-height:1.5}
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+/* Buttons base */
+button{font-family:var(--font);cursor:pointer}
 
-  body {
-    font-family: var(--font);
-    background: var(--bg);
-    color: var(--text-primary);
-    min-height: 100vh;
-    -webkit-font-smoothing: antialiased;
-  }
+/* Reset */
+.reset-btn{display:flex;align-items:center;gap:5px;padding:7px 13px;background:transparent;border:1px solid var(--border);border-radius:var(--r1);font-size:13px;font-weight:500;color:var(--ts);transition:all .15s}
+.reset-btn:hover{background:var(--surface);color:var(--tp)}
 
-  .container {
-    max-width: 680px;
-    margin: 0 auto;
-    padding: 24px 16px 60px;
-  }
+/* Install banner */
+.install-banner{display:none;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;background:var(--gbg);border:1px solid var(--green);border-radius:var(--r2);margin-bottom:18px}
+.install-banner.show{display:flex}
+.install-banner-text{font-size:13px;color:var(--gt);line-height:1.4}
+.install-banner-text strong{display:block;font-weight:600;margin-bottom:1px}
+.inst-btn{display:flex;align-items:center;gap:6px;padding:8px 14px;background:var(--green);color:#fff;border:none;border-radius:var(--r1);font-size:13px;font-weight:600;white-space:nowrap;flex-shrink:0}
+.dismiss-btn{background:transparent;border:none;color:var(--gt);font-size:20px;line-height:1;flex-shrink:0;padding:0 2px}
+.ios-hint{display:none;padding:11px 14px;background:var(--gbg);border:1px solid var(--green);border-radius:var(--r2);margin-bottom:18px;font-size:13px;color:var(--gt);line-height:1.5}
+.ios-hint.show{display:block}
+.ios-close{float:right;background:none;border:none;color:var(--gt);font-size:18px;cursor:pointer;line-height:1}
 
-  /* Header */
-  .header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 4px;
-  }
-  .header h1 {
-    font-size: 22px;
-    font-weight: 600;
-    color: var(--text-primary);
-    letter-spacing: -0.3px;
-  }
-  .header h1 span {
-    color: var(--green);
-  }
-  .subtitle {
-    font-size: 13px;
-    color: var(--text-secondary);
-    margin-bottom: 20px;
-    line-height: 1.5;
-  }
+/* Tabs */
+.tabs{display:flex;gap:6px;margin-bottom:20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:4px}
+.tab{flex:1;padding:8px 10px;background:transparent;border:none;border-radius:var(--r1);font-size:13px;font-weight:500;color:var(--ts);transition:all .15s;white-space:nowrap}
+.tab.active{background:var(--bg);color:var(--tp);box-shadow:0 1px 3px rgba(0,0,0,.08)}
 
-  /* Reset button */
-  .reset-btn {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    padding: 7px 13px;
-    background: transparent;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text-secondary);
-    cursor: pointer;
-    transition: all .15s;
-    font-family: var(--font);
-  }
-  .reset-btn:hover { background: var(--surface); color: var(--text-primary); }
-  .reset-btn i { font-size: 15px; }
+/* Panels */
+.panel{display:none}.panel.active{display:block}
+.slabel{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--tt);margin-bottom:10px;margin-top:18px}
+.slabel:first-child{margin-top:0}
 
-  /* Tabs */
-  .tabs {
-    display: flex;
-    gap: 6px;
-    margin-bottom: 20px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    padding: 4px;
-  }
-  .tab {
-    flex: 1;
-    padding: 8px 10px;
-    background: transparent;
-    border: none;
-    border-radius: var(--radius-sm);
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    color: var(--text-secondary);
-    transition: all .15s;
-    font-family: var(--font);
-    white-space: nowrap;
-  }
-  .tab.active {
-    background: var(--bg);
-    color: var(--text-primary);
-    box-shadow: 0 1px 3px rgba(0,0,0,.08);
-  }
+/* Item rows — using <button> for reliable mobile tap */
+.item{
+  display:flex;width:100%;align-items:center;justify-content:space-between;
+  padding:12px 14px;background:var(--surface);
+  border:1px solid var(--border-l);border-radius:var(--r2);
+  margin-bottom:7px;text-align:left;
+  transition:border-color .15s;
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
+}
+.item:active{opacity:.75}
+.item.checked{border-color:var(--green)}
+.item-l{display:flex;flex-direction:column;gap:2px;flex:1}
+.item-n{font-size:14px;color:var(--tp);font-weight:500}
+.item-s{font-size:12px;color:var(--ts)}
+.item-r{display:flex;align-items:center;gap:8px;margin-left:12px;flex-shrink:0}
+.badge{font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;background:var(--bg);color:var(--ts);border:1px solid var(--border-l)}
+.item.checked .badge{background:var(--gbg);color:var(--gt);border-color:transparent}
+.chk{width:20px;height:20px;border-radius:5px;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.item.checked .chk{background:var(--green);border-color:var(--green)}
+.chk i{font-size:13px;color:#fff;display:none}
+.item.checked .chk i{display:block}
 
-  /* Panels */
-  .panel { display: none; }
-  .panel.active { display: block; }
+/* Result card */
+.rcard{margin-top:20px;padding:18px 20px;border-radius:var(--r3);border:1px solid var(--border);background:var(--surface)}
+.srow{display:flex;align-items:baseline;gap:8px;margin-bottom:10px}
+.snum{font-size:48px;font-weight:600;letter-spacing:-1px;line-height:1}
+.smax{font-size:16px;color:var(--ts)}
+.bwrap{height:6px;background:var(--bg);border-radius:3px;margin-bottom:14px;overflow:hidden;border:1px solid var(--border-l)}
+.bfill{height:100%;border-radius:3px;transition:width .35s,background .35s}
+.bl{background:var(--green)}.bm{background:var(--amber)}.bh{background:var(--red)}
+.rbadge{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;font-size:13px;font-weight:600;margin-bottom:16px}
+.rl{background:var(--gbg);color:var(--gt)}.rm{background:var(--abg);color:var(--at)}.rh{background:var(--rbg);color:var(--rt)}
+.div{height:1px;background:var(--border-l);margin:14px 0}
+.rlabel{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--tt);margin-bottom:6px}
+.rtext{font-size:13px;color:var(--tp);line-height:1.65}
+.notes{margin-top:14px}
+.notes textarea{width:100%;border:1px solid var(--border-l);border-radius:var(--r1);background:var(--bg);color:var(--tp);font-family:var(--font);font-size:13px;padding:10px 12px;resize:vertical;min-height:78px;line-height:1.6;outline:none;transition:border-color .15s}
+.notes textarea:focus{border-color:var(--green)}
+.notes textarea::placeholder{color:var(--tt)}
 
-  /* Section label */
-  .section-label {
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: .07em;
-    color: var(--text-tertiary);
-    margin-bottom: 10px;
-    margin-top: 18px;
-  }
-  .section-label:first-child { margin-top: 0; }
+/* Compare */
+.cgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ccard{background:var(--surface);border:1px solid var(--border-l);border-radius:var(--r3);padding:16px}
+.ccl{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--tt);margin-bottom:8px}
+.cscore{font-size:38px;font-weight:600;letter-spacing:-.5px;line-height:1;margin-bottom:8px}
+.cscore span{font-size:16px;color:var(--ts);font-weight:400}
+.chint{font-size:12px;color:var(--ts);margin-top:6px}
+.ftable{margin-top:14px;background:var(--surface);border:1px solid var(--border-l);border-radius:var(--r3);padding:14px 16px}
+.ftitle{font-size:12px;font-weight:600;color:var(--ts);margin-bottom:12px}
+.fgrid{display:grid;grid-template-columns:1fr 60px 60px;gap:5px 8px;align-items:center;font-size:13px;color:var(--ts)}
+.fgrid .fh{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--tt)}
+.fgrid .fv{text-align:center;font-weight:500}
+.fgrid .fm{color:var(--tt)}
+.fgrid .fsep{grid-column:1/-1;height:1px;background:var(--border-l);margin:4px 0}
 
-  /* Items */
-  .item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 14px;
-    background: var(--surface);
-    border: 1px solid var(--border-light);
-    border-radius: var(--radius-md);
-    margin-bottom: 7px;
-    cursor: pointer;
-    transition: border-color .15s, box-shadow .15s;
-    user-select: none;
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
-    -webkit-touch-callout: none;
-  }
-  .item:active { opacity: .8; }
-  .item:hover { border-color: var(--border); box-shadow: 0 1px 4px rgba(0,0,0,.05); }
-  .item.checked { border-color: var(--green); background: var(--surface); }
-  .item * { pointer-events: none; }
-  .item-left { display: flex; flex-direction: column; gap: 2px; flex: 1; }
-  .item-name { font-size: 14px; color: var(--text-primary); font-weight: 450; }
-  .item-note { font-size: 12px; color: var(--text-secondary); }
-  .item-right { display: flex; align-items: center; gap: 8px; margin-left: 12px; }
+/* Footer */
+.footer{margin-top:32px;padding-top:16px;border-top:1px solid var(--border-l);font-size:12px;color:var(--tt);line-height:1.6;text-align:center}
 
-  .badge {
-    font-size: 11px;
-    font-weight: 600;
-    padding: 3px 9px;
-    border-radius: 20px;
-    background: var(--bg);
-    color: var(--text-secondary);
-    border: 1px solid var(--border-light);
-  }
-  .item.checked .badge { background: var(--green-bg); color: var(--green-text); border-color: transparent; }
-
-  .chk {
-    width: 20px; height: 20px;
-    border-radius: 5px;
-    border: 1.5px solid var(--border);
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-    transition: all .15s;
-  }
-  .item.checked .chk { background: var(--green); border-color: var(--green); }
-  .chk i { font-size: 13px; color: #fff; display: none; }
-  .item.checked .chk i { display: block; }
-
-  /* Result card */
-  .result-card {
-    margin-top: 20px;
-    padding: 18px 20px;
-    border-radius: var(--radius-lg);
-    border: 1px solid var(--border);
-    background: var(--surface);
-  }
-  .score-row { display: flex; align-items: baseline; gap: 8px; margin-bottom: 10px; }
-  .score-num { font-size: 48px; font-weight: 600; letter-spacing: -1px; line-height: 1; }
-  .score-max { font-size: 16px; color: var(--text-secondary); }
-
-  .bar-wrap {
-    height: 6px;
-    background: var(--bg);
-    border-radius: 3px;
-    margin-bottom: 14px;
-    overflow: hidden;
-    border: 1px solid var(--border-light);
-  }
-  .bar-fill { height: 100%; border-radius: 3px; transition: width .35s ease, background .35s; }
-  .bar-low { background: var(--green); }
-  .bar-mod { background: var(--amber); }
-  .bar-high { background: var(--red); }
-
-  .risk-badge {
-    display: inline-flex; align-items: center; gap: 6px;
-    padding: 5px 12px;
-    border-radius: 20px;
-    font-size: 13px; font-weight: 600;
-    margin-bottom: 16px;
-  }
-  .risk-low { background: var(--green-bg); color: var(--green-text); }
-  .risk-mod { background: var(--amber-bg); color: var(--amber-text); }
-  .risk-high { background: var(--red-bg); color: var(--red-text); }
-
-  .divider { height: 1px; background: var(--border-light); margin: 14px 0; }
-
-  .rec-label {
-    font-size: 11px; font-weight: 600;
-    text-transform: uppercase; letter-spacing: .07em;
-    color: var(--text-tertiary); margin-bottom: 6px;
-  }
-  .rec-text { font-size: 13px; color: var(--text-primary); line-height: 1.65; }
-
-  /* Notes */
-  .notes-area { margin-top: 14px; }
-  .notes-area textarea {
-    width: 100%;
-    border: 1px solid var(--border-light);
-    border-radius: var(--radius-sm);
-    background: var(--bg);
-    color: var(--text-primary);
-    font-family: var(--font);
-    font-size: 13px;
-    padding: 10px 12px;
-    resize: vertical;
-    min-height: 78px;
-    line-height: 1.6;
-    outline: none;
-    transition: border-color .15s;
-  }
-  .notes-area textarea:focus { border-color: var(--green); }
-  .notes-area textarea::placeholder { color: var(--text-tertiary); }
-
-  /* Compare panel */
-  .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .compare-card {
-    background: var(--surface);
-    border: 1px solid var(--border-light);
-    border-radius: var(--radius-lg);
-    padding: 16px;
-  }
-  .compare-card-label {
-    font-size: 11px; font-weight: 600;
-    text-transform: uppercase; letter-spacing: .07em;
-    color: var(--text-tertiary); margin-bottom: 8px;
-  }
-  .compare-score {
-    font-size: 38px; font-weight: 600;
-    letter-spacing: -0.5px; line-height: 1;
-    margin-bottom: 8px;
-  }
-  .compare-score span { font-size: 16px; color: var(--text-secondary); font-weight: 400; }
-  .compare-hint { font-size: 12px; color: var(--text-secondary); margin-top: 6px; }
-
-  .factor-table {
-    margin-top: 14px;
-    background: var(--surface);
-    border: 1px solid var(--border-light);
-    border-radius: var(--radius-lg);
-    padding: 14px 16px;
-  }
-  .factor-table-title {
-    font-size: 12px; font-weight: 600;
-    color: var(--text-secondary); margin-bottom: 12px;
-  }
-  .factor-grid {
-    display: grid;
-    grid-template-columns: 1fr 60px 60px;
-    gap: 5px 8px;
-    align-items: center;
-    font-size: 13px;
-    color: var(--text-secondary);
-  }
-  .factor-grid .hdr {
-    font-size: 10px; font-weight: 600;
-    text-transform: uppercase; letter-spacing: .06em;
-    color: var(--text-tertiary);
-  }
-  .factor-grid .val { text-align: center; font-weight: 500; }
-  .factor-grid .muted { color: var(--text-tertiary); }
-  .factor-grid .sep {
-    grid-column: 1 / -1;
-    height: 1px;
-    background: var(--border-light);
-    margin: 4px 0;
-  }
-
-  /* Install banner */
-  .install-banner {
-    display: none;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 12px 14px;
-    background: var(--green-bg);
-    border: 1px solid var(--green);
-    border-radius: var(--radius-md);
-    margin-bottom: 18px;
-  }
-  .install-banner.visible { display: flex; }
-  .install-banner-text { font-size: 13px; color: var(--green-text); line-height: 1.4; }
-  .install-banner-text strong { display: block; font-weight: 600; margin-bottom: 1px; }
-  .install-btn {
-    display: flex; align-items: center; gap: 6px;
-    padding: 8px 14px;
-    background: var(--green);
-    color: #fff;
-    border: none;
-    border-radius: var(--radius-sm);
-    font-size: 13px; font-weight: 600;
-    cursor: pointer;
-    white-space: nowrap;
-    font-family: var(--font);
-    flex-shrink: 0;
-    transition: opacity .15s;
-  }
-  .install-btn:hover { opacity: .88; }
-  .install-dismiss {
-    background: transparent; border: none;
-    color: var(--green-text); font-size: 18px;
-    cursor: pointer; padding: 0 2px; line-height: 1;
-    flex-shrink: 0;
-  }
-
-  /* iOS hint */
-  .ios-hint {
-    display: none;
-    padding: 11px 14px;
-    background: var(--green-bg);
-    border: 1px solid var(--green);
-    border-radius: var(--radius-md);
-    margin-bottom: 18px;
-    font-size: 13px;
-    color: var(--green-text);
-    line-height: 1.5;
-  }
-  .ios-hint.visible { display: block; }
-  .ios-hint strong { font-weight: 600; }
-
-  /* Footer */
-  .footer {
-    margin-top: 32px;
-    padding-top: 16px;
-    border-top: 1px solid var(--border-light);
-    font-size: 12px;
-    color: var(--text-tertiary);
-    line-height: 1.6;
-    text-align: center;
-  }
-
-  @media (max-width: 480px) {
-    .tab { font-size: 12px; padding: 7px 6px; }
-    .compare-grid { grid-template-columns: 1fr; }
-  }
+@media(max-width:480px){.tab{font-size:12px;padding:7px 6px}.cgrid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-<div class="container">
+<div class="wrap">
 
-  <div class="header">
-    <h1>Candida <span>Score</span></h1>
-    <button class="reset-btn" onclick="resetAll()" aria-label="Reset all fields">
-      <i class="ti ti-refresh" aria-hidden="true"></i> Reset
-    </button>
+<div class="hdr">
+  <h1>Candida <span>Score</span></h1>
+  <button class="reset-btn" onclick="resetAll()"><i class="ti ti-refresh"></i> Reset</button>
+</div>
+<p class="sub">Select applicable risk factors to calculate score and view antifungal recommendations.</p>
+
+<!-- Android install banner -->
+<div class="install-banner" id="install-banner">
+  <div class="install-banner-text">
+    <strong>Add to Home Screen</strong>Install for quick offline access
   </div>
-  <p class="subtitle">Select applicable risk factors to calculate score and view antifungal recommendations.</p>
+  <button class="inst-btn" onclick="doInstall()"><i class="ti ti-download"></i> Install</button>
+  <button class="dismiss-btn" onclick="dismissInstall()">×</button>
+</div>
 
-  <!-- Android / Chrome install banner -->
-  <div class="install-banner" id="install-banner">
-    <div class="install-banner-text">
-      <strong>Add to Home Screen</strong>
-      Install for quick offline access
+<!-- iOS hint -->
+<div class="ios-hint" id="ios-hint">
+  <button class="ios-close" onclick="dismissIos()">×</button>
+  <strong>Add to Home Screen:</strong> tap <strong>Share</strong> <i class="ti ti-share" style="font-size:13px"></i> then <strong>"Add to Home Screen"</strong>
+</div>
+
+<!-- Tabs -->
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('leon')">Leon 2006</button>
+  <button class="tab" onclick="switchTab('modified')">Modified</button>
+  <button class="tab" onclick="switchTab('compare')">Compare</button>
+</div>
+
+<!-- ── LEON 2006 ── -->
+<div class="panel active" id="panel-leon">
+  <p class="slabel">Risk factors</p>
+
+  <button class="item" id="l-surgery" onclick="toggle('l-surgery','leon')">
+    <div class="item-l">
+      <span class="item-n">Surgery on ICU admission</span>
+      <span class="item-s">Any surgical procedure at or before admission</span>
     </div>
-    <button class="install-btn" id="install-btn" onclick="doInstall()">
-      <i class="ti ti-download" aria-hidden="true"></i> Install
-    </button>
-    <button class="install-dismiss" onclick="dismissInstall()" aria-label="Dismiss">×</button>
+    <div class="item-r">
+      <span class="badge">+1</span>
+      <div class="chk"><i class="ti ti-check"></i></div>
+    </div>
+  </button>
+
+  <button class="item" id="l-tpn" onclick="toggle('l-tpn','leon')">
+    <div class="item-l">
+      <span class="item-n">Total parenteral nutrition (TPN)</span>
+      <span class="item-s">Active TPN at time of assessment</span>
+    </div>
+    <div class="item-r">
+      <span class="badge">+1</span>
+      <div class="chk"><i class="ti ti-check"></i></div>
+    </div>
+  </button>
+
+  <button class="item" id="l-colonization" onclick="toggle('l-colonization','leon')">
+    <div class="item-l">
+      <span class="item-n">Multifocal Candida colonization</span>
+      <span class="item-s">≥2 non-contiguous body sites positive</span>
+    </div>
+    <div class="item-r">
+      <span class="badge">+3</span>
+      <div class="chk"><i class="ti ti-check"></i></div>
+    </div>
+  </button>
+
+  <button class="item" id="l-sepsis" onclick="toggle('l-sepsis','leon')">
+    <div class="item-l">
+      <span class="item-n">Severe sepsis</span>
+      <span class="item-s">Sepsis with acute organ dysfunction</span>
+    </div>
+    <div class="item-r">
+      <span class="badge">+2</span>
+      <div class="chk"><i class="ti ti-check"></i></div>
+    </div>
+  </button>
+
+  <div class="rcard">
+    <div class="srow"><span class="snum" id="leon-num">0</span><span class="smax">/ 7</span></div>
+    <div class="bwrap"><div class="bfill bl" id="leon-bar" style="width:0%"></div></div>
+    <div class="rbadge rl" id="leon-risk"><i class="ti ti-circle"></i> Low risk</div>
+    <p class="rlabel">Recommendation</p>
+    <p class="rtext" id="leon-rec">Score &lt; 3 — invasive candidiasis unlikely. Antifungal prophylaxis not routinely indicated. Continue surveillance cultures and monitor clinical trajectory.</p>
+    <div class="div"></div>
+    <div class="notes"><p class="rlabel">Clinical notes</p><textarea id="notes-leon" placeholder="Add bedside notes, colonization sites, culture results…"></textarea></div>
   </div>
+</div>
 
-  <!-- iOS Safari hint -->
-  <div class="ios-hint" id="ios-hint">
-    <strong>Add to Home Screen:</strong> tap <strong>Share <i class="ti ti-share" style="font-size:13px"></i></strong> then <strong>"Add to Home Screen"</strong>
-    <button onclick="dismissIos()" style="float:right;background:none;border:none;color:var(--green-text);font-size:16px;cursor:pointer;line-height:1;margin-top:-2px">×</button>
+<!-- ── MODIFIED ── -->
+<div class="panel" id="panel-modified">
+  <p class="slabel">Core factors (Leon variables)</p>
+
+  <button class="item" id="m-surgery" onclick="toggle('m-surgery','modified')">
+    <div class="item-l"><span class="item-n">Surgery on ICU admission</span></div>
+    <div class="item-r"><span class="badge">+1</span><div class="chk"><i class="ti ti-check"></i></div></div>
+  </button>
+
+  <button class="item" id="m-tpn" onclick="toggle('m-tpn','modified')">
+    <div class="item-l"><span class="item-n">Total parenteral nutrition</span></div>
+    <div class="item-r"><span class="badge">+1</span><div class="chk"><i class="ti ti-check"></i></div></div>
+  </button>
+
+  <button class="item" id="m-colonization" onclick="toggle('m-colonization','modified')">
+    <div class="item-l">
+      <span class="item-n">Multifocal Candida colonization</span>
+      <span class="item-s">≥2 non-contiguous sites</span>
+    </div>
+    <div class="item-r"><span class="badge">+3</span><div class="chk"><i class="ti ti-check"></i></div></div>
+  </button>
+
+  <button class="item" id="m-sepsis" onclick="toggle('m-sepsis','modified')">
+    <div class="item-l"><span class="item-n">Severe sepsis / septic shock</span></div>
+    <div class="item-r"><span class="badge">+2</span><div class="chk"><i class="ti ti-check"></i></div></div>
+  </button>
+
+  <p class="slabel">Additional modifiers</p>
+
+  <button class="item" id="m-icu7" onclick="toggle('m-icu7','modified')">
+    <div class="item-l"><span class="item-n">ICU stay ≥ 7 days</span></div>
+    <div class="item-r"><span class="badge">+1</span><div class="chk"><i class="ti ti-check"></i></div></div>
+  </button>
+
+  <button class="item" id="m-abx" onclick="toggle('m-abx','modified')">
+    <div class="item-l"><span class="item-n">Broad-spectrum antibiotics ≥ 3 days</span></div>
+    <div class="item-r"><span class="badge">+1</span><div class="chk"><i class="ti ti-check"></i></div></div>
+  </button>
+
+  <button class="item" id="m-renal" onclick="toggle('m-renal','modified')">
+    <div class="item-l"><span class="item-n">Renal replacement therapy</span></div>
+    <div class="item-r"><span class="badge">+1</span><div class="chk"><i class="ti ti-check"></i></div></div>
+  </button>
+
+  <button class="item" id="m-immuno" onclick="toggle('m-immuno','modified')">
+    <div class="item-l">
+      <span class="item-n">Immunosuppression / steroids</span>
+      <span class="item-s">Systemic corticosteroids or immunosuppressants</span>
+    </div>
+    <div class="item-r"><span class="badge">+1</span><div class="chk"><i class="ti ti-check"></i></div></div>
+  </button>
+
+  <div class="rcard">
+    <div class="srow"><span class="snum" id="mod-num">0</span><span class="smax">/ 11</span></div>
+    <div class="bwrap"><div class="bfill bl" id="mod-bar" style="width:0%"></div></div>
+    <div class="rbadge rl" id="mod-risk"><i class="ti ti-circle"></i> Low risk</div>
+    <p class="rlabel">Recommendation</p>
+    <p class="rtext" id="mod-rec">Score 0–3 — low probability of invasive candidiasis. Standard precautions. No empirical antifungal indicated.</p>
+    <div class="div"></div>
+    <div class="notes"><p class="rlabel">Clinical notes</p><textarea id="notes-mod" placeholder="Add bedside notes, colonization sites, culture results…"></textarea></div>
   </div>
+</div>
 
-  <div class="tabs" role="tablist">
-    <button class="tab active" role="tab" aria-selected="true"  onclick="switchTab('leon')">Leon 2006</button>
-    <button class="tab"        role="tab" aria-selected="false" onclick="switchTab('modified')">Modified</button>
-    <button class="tab"        role="tab" aria-selected="false" onclick="switchTab('compare')">Compare</button>
-  </div>
-
-  <!-- ── LEON 2006 ── -->
-  <div class="panel active" id="panel-leon" role="tabpanel">
-    <p class="section-label">Risk factors</p>
-
-    <div class="item" id="l-surgery" onclick="toggle('l-surgery','leon')" role="checkbox" aria-checked="false" tabindex="0" onkeydown="if(event.key===' '||event.key==='Enter'){toggle('l-surgery','leon')}">
-      <div class="item-left">
-        <span class="item-name">Surgery on ICU admission</span>
-        <span class="item-note">Any surgical procedure at or before admission</span>
-      </div>
-      <div class="item-right">
-        <span class="badge">+1</span>
-        <div class="chk" aria-hidden="true"><i class="ti ti-check"></i></div>
-      </div>
+<!-- ── COMPARE ── -->
+<div class="panel" id="panel-compare">
+  <p style="font-size:13px;color:var(--ts);margin-bottom:14px">Scores reflect checkboxes selected in each tab.</p>
+  <div class="cgrid">
+    <div class="ccard">
+      <p class="ccl">Leon 2006</p>
+      <p class="cscore" id="cmp-leon-num">0 <span>/ 7</span></p>
+      <div class="rbadge rl" id="cmp-leon-risk" style="margin-bottom:0"><i class="ti ti-circle"></i> Low risk</div>
+      <p class="chint">Threshold: ≥ 3 → consider antifungal</p>
     </div>
-
-    <div class="item" id="l-tpn" onclick="toggle('l-tpn','leon')" role="checkbox" aria-checked="false" tabindex="0" onkeydown="if(event.key===' '||event.key==='Enter'){toggle('l-tpn','leon')}">
-      <div class="item-left">
-        <span class="item-name">Total parenteral nutrition (TPN)</span>
-        <span class="item-note">Active TPN at time of assessment</span>
-      </div>
-      <div class="item-right">
-        <span class="badge">+1</span>
-        <div class="chk" aria-hidden="true"><i class="ti ti-check"></i></div>
-      </div>
-    </div>
-
-    <div class="item" id="l-colonization" onclick="toggle('l-colonization','leon')" role="checkbox" aria-checked="false" tabindex="0" onkeydown="if(event.key===' '||event.key==='Enter'){toggle('l-colonization','leon')}">
-      <div class="item-left">
-        <span class="item-name">Multifocal Candida colonization</span>
-        <span class="item-note">≥2 non-contiguous body sites positive</span>
-      </div>
-      <div class="item-right">
-        <span class="badge">+3</span>
-        <div class="chk" aria-hidden="true"><i class="ti ti-check"></i></div>
-      </div>
-    </div>
-
-    <div class="item" id="l-sepsis" onclick="toggle('l-sepsis','leon')" role="checkbox" aria-checked="false" tabindex="0" onkeydown="if(event.key===' '||event.key==='Enter'){toggle('l-sepsis','leon')}">
-      <div class="item-left">
-        <span class="item-name">Severe sepsis</span>
-        <span class="item-note">Sepsis with acute organ dysfunction</span>
-      </div>
-      <div class="item-right">
-        <span class="badge">+2</span>
-        <div class="chk" aria-hidden="true"><i class="ti ti-check"></i></div>
-      </div>
-    </div>
-
-    <div class="result-card">
-      <div class="score-row">
-        <span class="score-num" id="leon-num">0</span>
-        <span class="score-max">/ 7</span>
-      </div>
-      <div class="bar-wrap"><div class="bar-fill bar-low" id="leon-bar" style="width:0%"></div></div>
-      <div class="risk-badge risk-low" id="leon-risk"><i class="ti ti-circle" aria-hidden="true"></i> Low risk</div>
-      <p class="rec-label">Recommendation</p>
-      <p class="rec-text" id="leon-rec">Score &lt; 3 — invasive candidiasis unlikely. Antifungal prophylaxis not routinely indicated. Continue surveillance cultures and monitor clinical trajectory.</p>
-      <div class="divider"></div>
-      <div class="notes-area">
-        <p class="rec-label">Clinical notes</p>
-        <textarea id="notes-leon" placeholder="Add bedside notes, colonization sites, culture results…" aria-label="Clinical notes for Leon 2006 score"></textarea>
-      </div>
-    </div>
-  </div>
-
-  <!-- ── MODIFIED ── -->
-  <div class="panel" id="panel-modified" role="tabpanel">
-    <p class="section-label">Core factors (Leon variables)</p>
-
-    <div class="item" id="m-surgery" onclick="toggle('m-surgery','modified')" role="checkbox" aria-checked="false" tabindex="0" onkeydown="if(event.key===' '||event.key==='Enter'){toggle('m-surgery','modified')}">
-      <div class="item-left"><span class="item-name">Surgery on ICU admission</span></div>
-      <div class="item-right"><span class="badge">+1</span><div class="chk" aria-hidden="true"><i class="ti ti-check"></i></div></div>
-    </div>
-
-    <div class="item" id="m-tpn" onclick="toggle('m-tpn','modified')" role="checkbox" aria-checked="false" tabindex="0" onkeydown="if(event.key===' '||event.key==='Enter'){toggle('m-tpn','modified')}">
-      <div class="item-left"><span class="item-name">Total parenteral nutrition</span></div>
-      <div class="item-right"><span class="badge">+1</span><div class="chk" aria-hidden="true"><i class="ti ti-check"></i></div></div>
-    </div>
-
-    <div class="item" id="m-colonization" onclick="toggle('m-colonization','modified')" role="checkbox" aria-checked="false" tabindex="0" onkeydown="if(event.key===' '||event.key==='Enter'){toggle('m-colonization','modified')}">
-      <div class="item-left">
-        <span class="item-name">Multifocal Candida colonization</span>
-        <span class="item-note">≥2 non-contiguous sites</span>
-      </div>
-      <div class="item-right"><span class="badge">+3</span><div class="chk" aria-hidden="true"><i class="ti ti-check"></i></div></div>
-    </div>
-
-    <div class="item" id="m-sepsis" onclick="toggle('m-sepsis','modified')" role="checkbox" aria-checked="false" tabindex="0" onkeydown="if(event.key===' '||event.key==='Enter'){toggle('m-sepsis','modified')}">
-      <div class="item-left"><span class="item-name">Severe sepsis / septic shock</span></div>
-      <div class="item-right"><span class="badge">+2</span><div class="chk" aria-hidden="true"><i class="ti ti-check"></i></div></div>
-    </div>
-
-    <p class="section-label">Additional modifiers</p>
-
-    <div class="item" id="m-icu7" onclick="toggle('m-icu7','modified')" role="checkbox" aria-checked="false" tabindex="0" onkeydown="if(event.key===' '||event.key==='Enter'){toggle('m-icu7','modified')}">
-      <div class="item-left"><span class="item-name">ICU stay ≥ 7 days</span></div>
-      <div class="item-right"><span class="badge">+1</span><div class="chk" aria-hidden="true"><i class="ti ti-check"></i></div></div>
-    </div>
-
-    <div class="item" id="m-abx" onclick="toggle('m-abx','modified')" role="checkbox" aria-checked="false" tabindex="0" onkeydown="if(event.key===' '||event.key==='Enter'){toggle('m-abx','modified')}">
-      <div class="item-left"><span class="item-name">Broad-spectrum antibiotics ≥ 3 days</span></div>
-      <div class="item-right"><span class="badge">+1</span><div class="chk" aria-hidden="true"><i class="ti ti-check"></i></div></div>
-    </div>
-
-    <div class="item" id="m-renal" onclick="toggle('m-renal','modified')" role="checkbox" aria-checked="false" tabindex="0" onkeydown="if(event.key===' '||event.key==='Enter'){toggle('m-renal','modified')}">
-      <div class="item-left"><span class="item-name">Renal replacement therapy</span></div>
-      <div class="item-right"><span class="badge">+1</span><div class="chk" aria-hidden="true"><i class="ti ti-check"></i></div></div>
-    </div>
-
-    <div class="item" id="m-immuno" onclick="toggle('m-immuno','modified')" role="checkbox" aria-checked="false" tabindex="0" onkeydown="if(event.key===' '||event.key==='Enter'){toggle('m-immuno','modified')}">
-      <div class="item-left">
-        <span class="item-name">Immunosuppression / steroids</span>
-        <span class="item-note">Systemic corticosteroids or immunosuppressants</span>
-      </div>
-      <div class="item-right"><span class="badge">+1</span><div class="chk" aria-hidden="true"><i class="ti ti-check"></i></div></div>
-    </div>
-
-    <div class="result-card">
-      <div class="score-row">
-        <span class="score-num" id="mod-num">0</span>
-        <span class="score-max">/ 11</span>
-      </div>
-      <div class="bar-wrap"><div class="bar-fill bar-low" id="mod-bar" style="width:0%"></div></div>
-      <div class="risk-badge risk-low" id="mod-risk"><i class="ti ti-circle" aria-hidden="true"></i> Low risk</div>
-      <p class="rec-label">Recommendation</p>
-      <p class="rec-text" id="mod-rec">Score 0–3 — low probability of invasive candidiasis. Standard precautions. No empirical antifungal indicated.</p>
-      <div class="divider"></div>
-      <div class="notes-area">
-        <p class="rec-label">Clinical notes</p>
-        <textarea id="notes-mod" placeholder="Add bedside notes, colonization sites, culture results…" aria-label="Clinical notes for modified score"></textarea>
-      </div>
-    </div>
-  </div>
-
-  <!-- ── COMPARE ── -->
-  <div class="panel" id="panel-compare" role="tabpanel">
-    <p style="font-size:13px;color:var(--text-secondary);margin-bottom:14px">
-      Scores reflect checkboxes selected in each tab. Select factors in the Leon and Modified tabs first.
-    </p>
-
-    <div class="compare-grid">
-      <div class="compare-card">
-        <p class="compare-card-label">Leon 2006</p>
-        <p class="compare-score" id="cmp-leon-num">0 <span>/ 7</span></p>
-        <div class="risk-badge risk-low" id="cmp-leon-risk" style="margin-bottom:0"><i class="ti ti-circle" aria-hidden="true"></i> Low risk</div>
-        <p class="compare-hint">Threshold: ≥ 3 → consider antifungal</p>
-      </div>
-      <div class="compare-card">
-        <p class="compare-card-label">Modified (expanded)</p>
-        <p class="compare-score" id="cmp-mod-num">0 <span>/ 11</span></p>
-        <div class="risk-badge risk-low" id="cmp-mod-risk" style="margin-bottom:0"><i class="ti ti-circle" aria-hidden="true"></i> Low risk</div>
-        <p class="compare-hint">Threshold: ≥ 4 → consider antifungal</p>
-      </div>
-    </div>
-
-    <div class="factor-table">
-      <p class="factor-table-title">Score composition</p>
-      <div class="factor-grid">
-        <span class="hdr">Factor</span>
-        <span class="hdr val">Leon</span>
-        <span class="hdr val">Mod.</span>
-        <div class="sep"></div>
-        <span>Surgery on ICU admission</span><span class="val">+1</span><span class="val">+1</span>
-        <span>Total parenteral nutrition</span><span class="val">+1</span><span class="val">+1</span>
-        <span>Multifocal colonization</span><span class="val">+3</span><span class="val">+3</span>
-        <span>Severe sepsis</span><span class="val">+2</span><span class="val">+2</span>
-        <div class="sep"></div>
-        <span class="muted">ICU stay ≥ 7 days</span><span class="val muted">—</span><span class="val">+1</span>
-        <span class="muted">Broad-spectrum antibiotics</span><span class="val muted">—</span><span class="val">+1</span>
-        <span class="muted">Renal replacement therapy</span><span class="val muted">—</span><span class="val">+1</span>
-        <span class="muted">Immunosuppression</span><span class="val muted">—</span><span class="val">+1</span>
-      </div>
+    <div class="ccard">
+      <p class="ccl">Modified</p>
+      <p class="cscore" id="cmp-mod-num">0 <span>/ 11</span></p>
+      <div class="rbadge rl" id="cmp-mod-risk" style="margin-bottom:0"><i class="ti ti-circle"></i> Low risk</div>
+      <p class="chint">Threshold: ≥ 4 → consider antifungal</p>
     </div>
   </div>
-
-  <div class="footer">
-    Leon C et al. <em>Crit Care Med</em> 2006;34:730–737 &nbsp;·&nbsp;
-    For clinical decision support only — not a substitute for clinical judgement.
+  <div class="ftable">
+    <p class="ftitle">Score composition</p>
+    <div class="fgrid">
+      <span class="fh">Factor</span><span class="fh fv">Leon</span><span class="fh fv">Mod.</span>
+      <div class="fsep"></div>
+      <span>Surgery</span><span class="fv">+1</span><span class="fv">+1</span>
+      <span>TPN</span><span class="fv">+1</span><span class="fv">+1</span>
+      <span>Multifocal colonization</span><span class="fv">+3</span><span class="fv">+3</span>
+      <span>Severe sepsis</span><span class="fv">+2</span><span class="fv">+2</span>
+      <div class="fsep"></div>
+      <span class="fm">ICU ≥ 7 days</span><span class="fv fm">—</span><span class="fv">+1</span>
+      <span class="fm">Broad-spectrum ABx</span><span class="fv fm">—</span><span class="fv">+1</span>
+      <span class="fm">Renal replacement</span><span class="fv fm">—</span><span class="fv">+1</span>
+      <span class="fm">Immunosuppression</span><span class="fv fm">—</span><span class="fv">+1</span>
+    </div>
   </div>
+</div>
 
-</div><!-- /container -->
+<div class="footer">
+  Leon C et al. <em>Crit Care Med</em> 2006;34:730–737 &nbsp;·&nbsp; For clinical decision support only.
+</div>
+
+</div><!-- /wrap -->
 
 <script>
-  const leonItems = { 'l-surgery':1, 'l-tpn':1, 'l-colonization':3, 'l-sepsis':2 };
-  const modItems  = { 'm-surgery':1, 'm-tpn':1, 'm-colonization':3, 'm-sepsis':2,
-                      'm-icu7':1, 'm-abx':1, 'm-renal':1, 'm-immuno':1 };
-  const state = { leon:{}, modified:{} };
+const LI={'l-surgery':1,'l-tpn':1,'l-colonization':3,'l-sepsis':2};
+const MI={'m-surgery':1,'m-tpn':1,'m-colonization':3,'m-sepsis':2,'m-icu7':1,'m-abx':1,'m-renal':1,'m-immuno':1};
+const S={leon:{},modified:{}};
 
-  function toggle(id, panel) {
-    const el = document.getElementById(id);
-    const on = el.classList.toggle('checked');
-    el.setAttribute('aria-checked', on.toString());
-    state[panel][id] = on;
-    recalc(panel);
-  }
+function toggle(id,panel){
+  const el=document.getElementById(id);
+  const on=el.classList.toggle('checked');
+  S[panel][id]=on;
+  recalc(panel);
+}
 
-  function resetAll() {
-    ['leon','modified'].forEach(panel => {
-      state[panel] = {};
-      const items = panel === 'leon' ? leonItems : modItems;
-      Object.keys(items).forEach(id => {
-        const el = document.getElementById(id);
-        if (el) { el.classList.remove('checked'); el.setAttribute('aria-checked','false'); }
-      });
-      recalc(panel);
+function resetAll(){
+  ['leon','modified'].forEach(p=>{
+    S[p]={};
+    Object.keys(p==='leon'?LI:MI).forEach(id=>{
+      const el=document.getElementById(id);
+      if(el)el.classList.remove('checked');
     });
-    document.getElementById('notes-leon').value = '';
-    document.getElementById('notes-mod').value  = '';
-  }
-
-  function leonRisk(s) {
-    if (s < 3) return { cls:'risk-low', label:'Low risk',      icon:'ti-circle' };
-    if (s < 5) return { cls:'risk-mod', label:'Moderate risk', icon:'ti-alert-triangle' };
-    return           { cls:'risk-high', label:'High risk',     icon:'ti-alert-circle' };
-  }
-  function modRisk(s) {
-    if (s < 4) return { cls:'risk-low', label:'Low risk',      icon:'ti-circle' };
-    if (s < 7) return { cls:'risk-mod', label:'Moderate risk', icon:'ti-alert-triangle' };
-    return           { cls:'risk-high', label:'High risk',     icon:'ti-alert-circle' };
-  }
-
-  function leonRec(s) {
-    if (s < 3) return 'Score &lt; 3 — invasive candidiasis unlikely. Antifungal prophylaxis not routinely indicated. Continue surveillance cultures and monitor clinical trajectory.';
-    if (s < 5) return 'Score 3–4 — moderate probability. Consider empirical antifungal therapy. Fluconazole IV (400 mg load, then 200–400 mg/day) for non-critically ill patients without prior azole exposure. Fluconazole 800 mg/400 mg if critically ill. Send blood cultures ×2. Reassess daily.';
-    return 'Score ≥ 5 — high probability of invasive candidiasis. Start empirical echinocandin: caspofungin 70 mg load then 50 mg/day, or micafungin 100 mg/day. Blood cultures ×2, ophthalmology review, echocardiogram if candidaemia confirmed. De-escalate to fluconazole once stable and sensitivities available.';
-  }
-  function modRec(s) {
-    if (s < 4) return 'Score 0–3 — low probability. No empirical antifungal needed. Standard surveillance; repeat cultures if clinical change.';
-    if (s < 7) return 'Score 4–6 — moderate probability. Empirical antifungal warranted. Fluconazole IV (400 mg load then 200–400 mg/day) for non-critically ill patients without prior azole exposure; echinocandin for critically ill or azole-exposed patients. Send blood cultures. Reassess at 72–96 h.';
-    return 'Score ≥ 7 — high probability. Initiate echinocandin empirically: caspofungin 70/50 mg/day or micafungin 100 mg/day. Escalate workup: blood cultures ×2, β-D-glucan, ophthalmology, echocardiogram. Target source control if feasible. Review at 5–7 days for de-escalation.';
-  }
-
-  function recalc(panel) {
-    const items = panel === 'leon' ? leonItems : modItems;
-    const st    = state[panel];
-    let total   = 0;
-    Object.keys(items).forEach(k => { if (st[k]) total += items[k]; });
-    const max   = panel === 'leon' ? 7 : 11;
-    const pct   = Math.round((total / max) * 100);
-
-    if (panel === 'leon') {
-      document.getElementById('leon-num').textContent = total;
-      const r = leonRisk(total);
-      const rEl = document.getElementById('leon-risk');
-      rEl.className = 'risk-badge ' + r.cls;
-      rEl.innerHTML = `<i class="ti ${r.icon}" aria-hidden="true"></i> ${r.label}`;
-      document.getElementById('leon-rec').innerHTML = leonRec(total);
-      const bar = document.getElementById('leon-bar');
-      bar.style.width = pct + '%';
-      bar.className   = 'bar-fill ' + (total < 3 ? 'bar-low' : total < 5 ? 'bar-mod' : 'bar-high');
-    } else {
-      document.getElementById('mod-num').textContent = total;
-      const r = modRisk(total);
-      const rEl = document.getElementById('mod-risk');
-      rEl.className = 'risk-badge ' + r.cls;
-      rEl.innerHTML = `<i class="ti ${r.icon}" aria-hidden="true"></i> ${r.label}`;
-      document.getElementById('mod-rec').innerHTML = modRec(total);
-      const bar = document.getElementById('mod-bar');
-      bar.style.width = pct + '%';
-      bar.className   = 'bar-fill ' + (total < 4 ? 'bar-low' : total < 7 ? 'bar-mod' : 'bar-high');
-    }
-    updateCompare();
-  }
-
-  function updateCompare() {
-    let lt = 0; Object.keys(leonItems).forEach(k => { if (state.leon[k])     lt += leonItems[k]; });
-    let mt = 0; Object.keys(modItems).forEach(k  => { if (state.modified[k]) mt += modItems[k];  });
-
-    document.getElementById('cmp-leon-num').innerHTML = `${lt} <span>/ 7</span>`;
-    document.getElementById('cmp-mod-num').innerHTML  = `${mt} <span>/ 11</span>`;
-
-    const lr = leonRisk(lt);
-    const le = document.getElementById('cmp-leon-risk');
-    le.className = 'risk-badge ' + lr.cls;
-    le.innerHTML = `<i class="ti ${lr.icon}" aria-hidden="true"></i> ${lr.label}`;
-
-    const mr = modRisk(mt);
-    const me = document.getElementById('cmp-mod-risk');
-    me.className = 'risk-badge ' + mr.cls;
-    me.innerHTML = `<i class="ti ${mr.icon}" aria-hidden="true"></i> ${mr.label}`;
-  }
-
-  // ── Service Worker ───────────────────────────────────────
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js').catch(() => {});
-    });
-  }
-
-  // ── PWA Install ──────────────────────────────────────────
-  let deferredPrompt = null;
-
-  function isIos() {
-    return /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
-  }
-  function isInStandaloneMode() {
-    return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-  }
-
-  // Android/Chrome: capture beforeinstallprompt
-  window.addEventListener('beforeinstallprompt', e => {
-    e.preventDefault();
-    deferredPrompt = e;
-    if (!sessionStorage.getItem('installDismissed')) {
-      document.getElementById('install-banner').classList.add('visible');
-    }
+    recalc(p);
   });
+  document.getElementById('notes-leon').value='';
+  document.getElementById('notes-mod').value='';
+}
 
-  function doInstall() {
-    if (!deferredPrompt) return;
-    deferredPrompt.prompt();
-    deferredPrompt.userChoice.then(() => {
-      deferredPrompt = null;
-      document.getElementById('install-banner').classList.remove('visible');
-    });
+function lRisk(s){
+  if(s<3)return{c:'rl',l:'Low risk',i:'ti-circle'};
+  if(s<5)return{c:'rm',l:'Moderate risk',i:'ti-alert-triangle'};
+  return{c:'rh',l:'High risk',i:'ti-alert-circle'};
+}
+function mRisk(s){
+  if(s<4)return{c:'rl',l:'Low risk',i:'ti-circle'};
+  if(s<7)return{c:'rm',l:'Moderate risk',i:'ti-alert-triangle'};
+  return{c:'rh',l:'High risk',i:'ti-alert-circle'};
+}
+function lRec(s){
+  if(s<3)return'Score &lt; 3 — invasive candidiasis unlikely. Antifungal prophylaxis not routinely indicated. Continue surveillance cultures and monitor clinical trajectory.';
+  if(s<5)return'Score 3–4 — moderate probability. Consider empirical antifungal therapy. Fluconazole IV (400 mg load then 200–400 mg/day) for non-critically ill patients without prior azole exposure; fluconazole 800/400 mg if critically ill. Send blood cultures ×2. Reassess daily.';
+  return'Score ≥ 5 — high probability of invasive candidiasis. Start empirical echinocandin: caspofungin 70 mg load then 50 mg/day, or micafungin 100 mg/day. Blood cultures ×2, ophthalmology review, echocardiogram if candidaemia confirmed. De-escalate to fluconazole once stable.';
+}
+function mRec(s){
+  if(s<4)return'Score 0–3 — low probability. No empirical antifungal needed. Standard surveillance; repeat cultures if clinical change.';
+  if(s<7)return'Score 4–6 — moderate probability. Empirical antifungal warranted. Fluconazole IV (400 mg load then 200–400 mg/day) for non-critically ill without prior azole exposure; echinocandin for critically ill or azole-exposed. Send blood cultures. Reassess at 72–96 h.';
+  return'Score ≥ 7 — high probability. Initiate echinocandin empirically: caspofungin 70/50 mg/day or micafungin 100 mg/day. Escalate workup: blood cultures ×2, β-D-glucan, ophthalmology, echocardiogram. Target source control. Review at 5–7 days for de-escalation.';
+}
+
+function recalc(panel){
+  const items=panel==='leon'?LI:MI;
+  let tot=0;
+  Object.keys(items).forEach(k=>{if(S[panel][k])tot+=items[k];});
+  const max=panel==='leon'?7:11;
+  const pct=Math.round(tot/max*100);
+  if(panel==='leon'){
+    document.getElementById('leon-num').textContent=tot;
+    const r=lRisk(tot);
+    const re=document.getElementById('leon-risk');
+    re.className='rbadge '+r.c;
+    re.innerHTML=`<i class="ti ${r.i}"></i> ${r.l}`;
+    document.getElementById('leon-rec').innerHTML=lRec(tot);
+    const b=document.getElementById('leon-bar');
+    b.style.width=pct+'%';
+    b.className='bfill '+(tot<3?'bl':tot<5?'bm':'bh');
+  }else{
+    document.getElementById('mod-num').textContent=tot;
+    const r=mRisk(tot);
+    const re=document.getElementById('mod-risk');
+    re.className='rbadge '+r.c;
+    re.innerHTML=`<i class="ti ${r.i}"></i> ${r.l}`;
+    document.getElementById('mod-rec').innerHTML=mRec(tot);
+    const b=document.getElementById('mod-bar');
+    b.style.width=pct+'%';
+    b.className='bfill '+(tot<4?'bl':tot<7?'bm':'bh');
   }
-  function dismissInstall() {
-    sessionStorage.setItem('installDismissed', '1');
-    document.getElementById('install-banner').classList.remove('visible');
-  }
+  updateCompare();
+}
 
-  // iOS: show hint once per session
-  function dismissIos() {
-    sessionStorage.setItem('iosDismissed', '1');
-    document.getElementById('ios-hint').classList.remove('visible');
-  }
+function updateCompare(){
+  let lt=0;Object.keys(LI).forEach(k=>{if(S.leon[k])lt+=LI[k];});
+  let mt=0;Object.keys(MI).forEach(k=>{if(S.modified[k])mt+=MI[k];});
+  document.getElementById('cmp-leon-num').innerHTML=`${lt} <span>/ 7</span>`;
+  document.getElementById('cmp-mod-num').innerHTML=`${mt} <span>/ 11</span>`;
+  const lr=lRisk(lt),le=document.getElementById('cmp-leon-risk');
+  le.className='rbadge '+lr.c;le.innerHTML=`<i class="ti ${lr.i}"></i> ${lr.l}`;
+  const mr=mRisk(mt),me=document.getElementById('cmp-mod-risk');
+  me.className='rbadge '+mr.c;me.innerHTML=`<i class="ti ${mr.i}"></i> ${mr.l}`;
+}
 
-  window.addEventListener('load', () => {
-    if (isIos() && !isInStandaloneMode() && !sessionStorage.getItem('iosDismissed')) {
-      document.getElementById('ios-hint').classList.add('visible');
-    }
-  });
+function switchTab(tab){
+  const order=['leon','modified','compare'];
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',order[i]===tab));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+tab).classList.add('active');
+}
 
-  // Hide banners once installed
-  window.addEventListener('appinstalled', () => {
-    document.getElementById('install-banner').classList.remove('visible');
-    document.getElementById('ios-hint').classList.remove('visible');
-  });
-  // ─────────────────────────────────────────────────────────
+/* ── Service Worker ── */
+if('serviceWorker'in navigator){
+  window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+}
 
-    const order = ['leon','modified','compare'];
-    document.querySelectorAll('.tab').forEach((t, i) => {
-      const active = order[i] === tab;
-      t.classList.toggle('active', active);
-      t.setAttribute('aria-selected', active.toString());
-    });
-    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-    document.getElementById('panel-' + tab).classList.add('active');
-  }
+/* ── PWA Install ── */
+let dProm=null;
+function isIos(){return/iphone|ipad|ipod/i.test(navigator.userAgent)&&!window.MSStream;}
+function isStandalone(){return window.matchMedia('(display-mode:standalone)').matches||navigator.standalone;}
+
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault();dProm=e;
+  if(!sessionStorage.getItem('instDismissed'))
+    document.getElementById('install-banner').classList.add('show');
+});
+function doInstall(){
+  if(!dProm)return;
+  dProm.prompt();
+  dProm.userChoice.then(()=>{dProm=null;document.getElementById('install-banner').classList.remove('show');});
+}
+function dismissInstall(){
+  sessionStorage.setItem('instDismissed','1');
+  document.getElementById('install-banner').classList.remove('show');
+}
+function dismissIos(){
+  sessionStorage.setItem('iosDism','1');
+  document.getElementById('ios-hint').classList.remove('show');
+}
+window.addEventListener('load',()=>{
+  if(isIos()&&!isStandalone()&&!sessionStorage.getItem('iosDism'))
+    document.getElementById('ios-hint').classList.add('show');
+});
+window.addEventListener('appinstalled',()=>{
+  document.getElementById('install-banner').classList.remove('show');
+  document.getElementById('ios-hint').classList.remove('show');
+});
 </script>
 </body>
 </html>
