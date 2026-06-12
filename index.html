@@ -326,6 +326,58 @@
     margin: 4px 0;
   }
 
+  /* Install banner */
+  .install-banner {
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 14px;
+    background: var(--green-bg);
+    border: 1px solid var(--green);
+    border-radius: var(--radius-md);
+    margin-bottom: 18px;
+  }
+  .install-banner.visible { display: flex; }
+  .install-banner-text { font-size: 13px; color: var(--green-text); line-height: 1.4; }
+  .install-banner-text strong { display: block; font-weight: 600; margin-bottom: 1px; }
+  .install-btn {
+    display: flex; align-items: center; gap: 6px;
+    padding: 8px 14px;
+    background: var(--green);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 13px; font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    font-family: var(--font);
+    flex-shrink: 0;
+    transition: opacity .15s;
+  }
+  .install-btn:hover { opacity: .88; }
+  .install-dismiss {
+    background: transparent; border: none;
+    color: var(--green-text); font-size: 18px;
+    cursor: pointer; padding: 0 2px; line-height: 1;
+    flex-shrink: 0;
+  }
+
+  /* iOS hint */
+  .ios-hint {
+    display: none;
+    padding: 11px 14px;
+    background: var(--green-bg);
+    border: 1px solid var(--green);
+    border-radius: var(--radius-md);
+    margin-bottom: 18px;
+    font-size: 13px;
+    color: var(--green-text);
+    line-height: 1.5;
+  }
+  .ios-hint.visible { display: block; }
+  .ios-hint strong { font-weight: 600; }
+
   /* Footer */
   .footer {
     margin-top: 32px;
@@ -353,6 +405,24 @@
     </button>
   </div>
   <p class="subtitle">Select applicable risk factors to calculate score and view antifungal recommendations.</p>
+
+  <!-- Android / Chrome install banner -->
+  <div class="install-banner" id="install-banner">
+    <div class="install-banner-text">
+      <strong>Add to Home Screen</strong>
+      Install for quick offline access
+    </div>
+    <button class="install-btn" id="install-btn" onclick="doInstall()">
+      <i class="ti ti-download" aria-hidden="true"></i> Install
+    </button>
+    <button class="install-dismiss" onclick="dismissInstall()" aria-label="Dismiss">×</button>
+  </div>
+
+  <!-- iOS Safari hint -->
+  <div class="ios-hint" id="ios-hint">
+    <strong>Add to Home Screen:</strong> tap <strong>Share <i class="ti ti-share" style="font-size:13px"></i></strong> then <strong>"Add to Home Screen"</strong>
+    <button onclick="dismissIos()" style="float:right;background:none;border:none;color:var(--green-text);font-size:16px;cursor:pointer;line-height:1;margin-top:-2px">×</button>
+  </div>
 
   <div class="tabs" role="tablist">
     <button class="tab active" role="tab" aria-selected="true"  onclick="switchTab('leon')">Leon 2006</button>
@@ -642,7 +712,64 @@
     me.innerHTML = `<i class="ti ${mr.icon}" aria-hidden="true"></i> ${mr.label}`;
   }
 
-  function switchTab(tab) {
+  // ── Service Worker ───────────────────────────────────────
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js').catch(() => {});
+    });
+  }
+
+  // ── PWA Install ──────────────────────────────────────────
+  let deferredPrompt = null;
+
+  function isIos() {
+    return /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+  }
+  function isInStandaloneMode() {
+    return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+  }
+
+  // Android/Chrome: capture beforeinstallprompt
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault();
+    deferredPrompt = e;
+    if (!sessionStorage.getItem('installDismissed')) {
+      document.getElementById('install-banner').classList.add('visible');
+    }
+  });
+
+  function doInstall() {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(() => {
+      deferredPrompt = null;
+      document.getElementById('install-banner').classList.remove('visible');
+    });
+  }
+  function dismissInstall() {
+    sessionStorage.setItem('installDismissed', '1');
+    document.getElementById('install-banner').classList.remove('visible');
+  }
+
+  // iOS: show hint once per session
+  function dismissIos() {
+    sessionStorage.setItem('iosDismissed', '1');
+    document.getElementById('ios-hint').classList.remove('visible');
+  }
+
+  window.addEventListener('load', () => {
+    if (isIos() && !isInStandaloneMode() && !sessionStorage.getItem('iosDismissed')) {
+      document.getElementById('ios-hint').classList.add('visible');
+    }
+  });
+
+  // Hide banners once installed
+  window.addEventListener('appinstalled', () => {
+    document.getElementById('install-banner').classList.remove('visible');
+    document.getElementById('ios-hint').classList.remove('visible');
+  });
+  // ─────────────────────────────────────────────────────────
+
     const order = ['leon','modified','compare'];
     document.querySelectorAll('.tab').forEach((t, i) => {
       const active = order[i] === tab;
