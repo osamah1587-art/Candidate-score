@@ -1,4 +1,4 @@
-const CACHE = 'candida-score-v3';
+const CACHE = 'candida-score-v4';
 const ASSETS = [
   './',
   './index.html',

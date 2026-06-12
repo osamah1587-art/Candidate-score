@@ -29,30 +29,45 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:var(--font);background:var(--bg);color:var(--tp);min-height:100vh;-webkit-font-smoothing:antialiased}
 .wrap{max-width:680px;margin:0 auto;padding:24px 16px 60px}
-
-/* Header */
-.hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
-.hdr h1{font-size:22px;font-weight:600;letter-spacing:-.3px}
-.hdr h1 span{color:var(--green)}
-.sub{font-size:13px;color:var(--ts);margin-bottom:20px;line-height:1.5}
-
-/* Buttons base */
 button{font-family:var(--font);cursor:pointer}
 
-/* Reset */
-.reset-btn{display:flex;align-items:center;gap:5px;padding:7px 13px;background:transparent;border:1px solid var(--border);border-radius:var(--r1);font-size:13px;font-weight:500;color:var(--ts);transition:all .15s}
-.reset-btn:hover{background:var(--surface);color:var(--tp)}
+/* Header */
+.hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;gap:8px}
+.hdr h1{font-size:22px;font-weight:600;letter-spacing:-.3px;flex:1}
+.hdr h1 span{color:var(--green)}
+.sub{font-size:13px;color:var(--ts);margin-bottom:20px;line-height:1.5}
+.hdr-btns{display:flex;gap:6px;align-items:center;flex-shrink:0}
 
-/* Install banner */
-.install-banner{display:none;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;background:var(--gbg);border:1px solid var(--green);border-radius:var(--r2);margin-bottom:18px}
-.install-banner.show{display:flex}
-.install-banner-text{font-size:13px;color:var(--gt);line-height:1.4}
-.install-banner-text strong{display:block;font-weight:600;margin-bottom:1px}
-.inst-btn{display:flex;align-items:center;gap:6px;padding:8px 14px;background:var(--green);color:#fff;border:none;border-radius:var(--r1);font-size:13px;font-weight:600;white-space:nowrap;flex-shrink:0}
-.dismiss-btn{background:transparent;border:none;color:var(--gt);font-size:20px;line-height:1;flex-shrink:0;padding:0 2px}
-.ios-hint{display:none;padding:11px 14px;background:var(--gbg);border:1px solid var(--green);border-radius:var(--r2);margin-bottom:18px;font-size:13px;color:var(--gt);line-height:1.5}
-.ios-hint.show{display:block}
-.ios-close{float:right;background:none;border:none;color:var(--gt);font-size:18px;cursor:pointer;line-height:1}
+/* Header buttons */
+.reset-btn{display:flex;align-items:center;gap:5px;padding:7px 11px;background:transparent;border:1px solid var(--border);border-radius:var(--r1);font-size:13px;font-weight:500;color:var(--ts);transition:all .15s}
+.reset-btn:hover{background:var(--surface);color:var(--tp)}
+.add-btn{display:flex;align-items:center;gap:5px;padding:7px 11px;background:var(--green);border:none;border-radius:var(--r1);font-size:13px;font-weight:600;color:#fff;transition:opacity .15s}
+.add-btn:hover{opacity:.88}
+.add-btn.hidden{display:none}
+
+/* Install modal overlay */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;align-items:flex-end;justify-content:center;padding:0}
+.modal-overlay.show{display:flex}
+.modal{background:var(--surface);border-radius:20px 20px 0 0;padding:24px 20px 36px;width:100%;max-width:480px;animation:slideUp .25s ease}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-handle{width:40px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 20px}
+.modal-title{font-size:17px;font-weight:600;margin-bottom:4px}
+.modal-sub{font-size:13px;color:var(--ts);margin-bottom:20px;line-height:1.5}
+.modal-close{position:absolute;top:16px;right:16px;background:var(--bg);border:none;border-radius:50%;width:30px;height:30px;font-size:16px;color:var(--ts);display:flex;align-items:center;justify-content:center}
+
+/* Install steps */
+.inst-step{display:flex;align-items:flex-start;gap:12px;margin-bottom:14px}
+.inst-num{width:26px;height:26px;border-radius:50%;background:var(--green);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.inst-step-text{font-size:14px;color:var(--tp);line-height:1.5}
+.inst-step-text strong{font-weight:600}
+.inst-icon{display:inline-flex;align-items:center;justify-content:center;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:2px 6px;font-size:12px;vertical-align:middle;margin:0 2px}
+
+/* One-tap install button inside modal */
+.modal-inst-btn{width:100%;padding:14px;background:var(--green);color:#fff;border:none;border-radius:var(--r2);font-size:15px;font-weight:600;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:8px}
+.modal-inst-btn.hidden{display:none}
+.modal-divider{display:flex;align-items:center;gap:10px;margin:16px 0;color:var(--tt);font-size:12px}
+.modal-divider::before,.modal-divider::after{content:'';flex:1;height:1px;background:var(--border-l)}
+.modal-divider.hidden{display:none}
 
 /* Tabs */
 .tabs{display:flex;gap:6px;margin-bottom:20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:4px}
@@ -64,16 +79,8 @@ button{font-family:var(--font);cursor:pointer}
 .slabel{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--tt);margin-bottom:10px;margin-top:18px}
 .slabel:first-child{margin-top:0}
 
-/* Item rows — using <button> for reliable mobile tap */
-.item{
-  display:flex;width:100%;align-items:center;justify-content:space-between;
-  padding:12px 14px;background:var(--surface);
-  border:1px solid var(--border-l);border-radius:var(--r2);
-  margin-bottom:7px;text-align:left;
-  transition:border-color .15s;
-  -webkit-tap-highlight-color:transparent;
-  touch-action:manipulation;
-}
+/* Item rows */
+.item{display:flex;width:100%;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--surface);border:1px solid var(--border-l);border-radius:var(--r2);margin-bottom:7px;text-align:left;transition:border-color .15s;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 .item:active{opacity:.75}
 .item.checked{border-color:var(--green)}
 .item-l{display:flex;flex-direction:column;gap:2px;flex:1}
@@ -119,35 +126,40 @@ button{font-family:var(--font);cursor:pointer}
 .fgrid .fv{text-align:center;font-weight:500}
 .fgrid .fm{color:var(--tt)}
 .fgrid .fsep{grid-column:1/-1;height:1px;background:var(--border-l);margin:4px 0}
-
-/* Footer */
 .footer{margin-top:32px;padding-top:16px;border-top:1px solid var(--border-l);font-size:12px;color:var(--tt);line-height:1.6;text-align:center}
-
 @media(max-width:480px){.tab{font-size:12px;padding:7px 6px}.cgrid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <div class="wrap">
 
+<!-- Header -->
 <div class="hdr">
   <h1>Candida <span>Score</span></h1>
-  <button class="reset-btn" onclick="resetAll()"><i class="ti ti-refresh"></i> Reset</button>
+  <div class="hdr-btns">
+    <button class="add-btn" id="add-btn" onclick="showInstallModal()"><i class="ti ti-download"></i> Install</button>
+    <button class="reset-btn" onclick="resetAll()"><i class="ti ti-refresh"></i> Reset</button>
+  </div>
 </div>
 <p class="sub">Select applicable risk factors to calculate score and view antifungal recommendations.</p>
 
-<!-- Android install banner -->
-<div class="install-banner" id="install-banner">
-  <div class="install-banner-text">
-    <strong>Add to Home Screen</strong>Install for quick offline access
-  </div>
-  <button class="inst-btn" onclick="doInstall()"><i class="ti ti-download"></i> Install</button>
-  <button class="dismiss-btn" onclick="dismissInstall()">×</button>
-</div>
+<!-- Install Modal -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModalOutside(event)">
+  <div class="modal" id="modal" style="position:relative">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <p class="modal-title" id="modal-title">Add to Home Screen</p>
+    <p class="modal-sub" id="modal-sub">Install for quick access — works offline too.</p>
 
-<!-- iOS hint -->
-<div class="ios-hint" id="ios-hint">
-  <button class="ios-close" onclick="dismissIos()">×</button>
-  <strong>Add to Home Screen:</strong> tap <strong>Share</strong> <i class="ti ti-share" style="font-size:13px"></i> then <strong>"Add to Home Screen"</strong>
+    <!-- One-tap install (Chrome Android) -->
+    <button class="modal-inst-btn hidden" id="modal-inst-btn" onclick="doInstall()">
+      <i class="ti ti-download"></i> Install App
+    </button>
+    <div class="modal-divider hidden" id="modal-divider">or follow these steps</div>
+
+    <!-- Steps (shown for iOS / fallback) -->
+    <div id="modal-steps"></div>
+  </div>
 </div>
 
 <!-- Tabs -->
@@ -157,54 +169,25 @@ button{font-family:var(--font);cursor:pointer}
   <button class="tab" onclick="switchTab('compare')">Compare</button>
 </div>
 
-<!-- ── LEON 2006 ── -->
+<!-- LEON 2006 -->
 <div class="panel active" id="panel-leon">
   <p class="slabel">Risk factors</p>
-
   <button class="item" id="l-surgery" onclick="toggle('l-surgery','leon')">
-    <div class="item-l">
-      <span class="item-n">Surgery on ICU admission</span>
-      <span class="item-s">Any surgical procedure at or before admission</span>
-    </div>
-    <div class="item-r">
-      <span class="badge">+1</span>
-      <div class="chk"><i class="ti ti-check"></i></div>
-    </div>
+    <div class="item-l"><span class="item-n">Surgery on ICU admission</span><span class="item-s">Any surgical procedure at or before admission</span></div>
+    <div class="item-r"><span class="badge">+1</span><div class="chk"><i class="ti ti-check"></i></div></div>
   </button>
-
   <button class="item" id="l-tpn" onclick="toggle('l-tpn','leon')">
-    <div class="item-l">
-      <span class="item-n">Total parenteral nutrition (TPN)</span>
-      <span class="item-s">Active TPN at time of assessment</span>
-    </div>
-    <div class="item-r">
-      <span class="badge">+1</span>
-      <div class="chk"><i class="ti ti-check"></i></div>
-    </div>
+    <div class="item-l"><span class="item-n">Total parenteral nutrition (TPN)</span><span class="item-s">Active TPN at time of assessment</span></div>
+    <div class="item-r"><span class="badge">+1</span><div class="chk"><i class="ti ti-check"></i></div></div>
   </button>
-
   <button class="item" id="l-colonization" onclick="toggle('l-colonization','leon')">
-    <div class="item-l">
-      <span class="item-n">Multifocal Candida colonization</span>
-      <span class="item-s">≥2 non-contiguous body sites positive</span>
-    </div>
-    <div class="item-r">
-      <span class="badge">+3</span>
-      <div class="chk"><i class="ti ti-check"></i></div>
-    </div>
+    <div class="item-l"><span class="item-n">Multifocal Candida colonization</span><span class="item-s">≥2 non-contiguous body sites positive</span></div>
+    <div class="item-r"><span class="badge">+3</span><div class="chk"><i class="ti ti-check"></i></div></div>
   </button>
-
   <button class="item" id="l-sepsis" onclick="toggle('l-sepsis','leon')">
-    <div class="item-l">
-      <span class="item-n">Severe sepsis</span>
-      <span class="item-s">Sepsis with acute organ dysfunction</span>
-    </div>
-    <div class="item-r">
-      <span class="badge">+2</span>
-      <div class="chk"><i class="ti ti-check"></i></div>
-    </div>
+    <div class="item-l"><span class="item-n">Severe sepsis</span><span class="item-s">Sepsis with acute organ dysfunction</span></div>
+    <div class="item-r"><span class="badge">+2</span><div class="chk"><i class="ti ti-check"></i></div></div>
   </button>
-
   <div class="rcard">
     <div class="srow"><span class="snum" id="leon-num">0</span><span class="smax">/ 7</span></div>
     <div class="bwrap"><div class="bfill bl" id="leon-bar" style="width:0%"></div></div>
@@ -216,58 +199,42 @@ button{font-family:var(--font);cursor:pointer}
   </div>
 </div>
 
-<!-- ── MODIFIED ── -->
+<!-- MODIFIED -->
 <div class="panel" id="panel-modified">
   <p class="slabel">Core factors (Leon variables)</p>
-
   <button class="item" id="m-surgery" onclick="toggle('m-surgery','modified')">
     <div class="item-l"><span class="item-n">Surgery on ICU admission</span></div>
     <div class="item-r"><span class="badge">+1</span><div class="chk"><i class="ti ti-check"></i></div></div>
   </button>
-
   <button class="item" id="m-tpn" onclick="toggle('m-tpn','modified')">
     <div class="item-l"><span class="item-n">Total parenteral nutrition</span></div>
     <div class="item-r"><span class="badge">+1</span><div class="chk"><i class="ti ti-check"></i></div></div>
   </button>
-
   <button class="item" id="m-colonization" onclick="toggle('m-colonization','modified')">
-    <div class="item-l">
-      <span class="item-n">Multifocal Candida colonization</span>
-      <span class="item-s">≥2 non-contiguous sites</span>
-    </div>
+    <div class="item-l"><span class="item-n">Multifocal Candida colonization</span><span class="item-s">≥2 non-contiguous sites</span></div>
     <div class="item-r"><span class="badge">+3</span><div class="chk"><i class="ti ti-check"></i></div></div>
   </button>
-
   <button class="item" id="m-sepsis" onclick="toggle('m-sepsis','modified')">
     <div class="item-l"><span class="item-n">Severe sepsis / septic shock</span></div>
     <div class="item-r"><span class="badge">+2</span><div class="chk"><i class="ti ti-check"></i></div></div>
   </button>
-
   <p class="slabel">Additional modifiers</p>
-
   <button class="item" id="m-icu7" onclick="toggle('m-icu7','modified')">
     <div class="item-l"><span class="item-n">ICU stay ≥ 7 days</span></div>
     <div class="item-r"><span class="badge">+1</span><div class="chk"><i class="ti ti-check"></i></div></div>
   </button>
-
   <button class="item" id="m-abx" onclick="toggle('m-abx','modified')">
     <div class="item-l"><span class="item-n">Broad-spectrum antibiotics ≥ 3 days</span></div>
     <div class="item-r"><span class="badge">+1</span><div class="chk"><i class="ti ti-check"></i></div></div>
   </button>
-
   <button class="item" id="m-renal" onclick="toggle('m-renal','modified')">
     <div class="item-l"><span class="item-n">Renal replacement therapy</span></div>
     <div class="item-r"><span class="badge">+1</span><div class="chk"><i class="ti ti-check"></i></div></div>
   </button>
-
   <button class="item" id="m-immuno" onclick="toggle('m-immuno','modified')">
-    <div class="item-l">
-      <span class="item-n">Immunosuppression / steroids</span>
-      <span class="item-s">Systemic corticosteroids or immunosuppressants</span>
-    </div>
+    <div class="item-l"><span class="item-n">Immunosuppression / steroids</span><span class="item-s">Systemic corticosteroids or immunosuppressants</span></div>
     <div class="item-r"><span class="badge">+1</span><div class="chk"><i class="ti ti-check"></i></div></div>
   </button>
-
   <div class="rcard">
     <div class="srow"><span class="snum" id="mod-num">0</span><span class="smax">/ 11</span></div>
     <div class="bwrap"><div class="bfill bl" id="mod-bar" style="width:0%"></div></div>
@@ -279,7 +246,7 @@ button{font-family:var(--font);cursor:pointer}
   </div>
 </div>
 
-<!-- ── COMPARE ── -->
+<!-- COMPARE -->
 <div class="panel" id="panel-compare">
   <p style="font-size:13px;color:var(--ts);margin-bottom:14px">Scores reflect checkboxes selected in each tab.</p>
   <div class="cgrid">
@@ -317,8 +284,7 @@ button{font-family:var(--font);cursor:pointer}
 <div class="footer">
   Leon C et al. <em>Crit Care Med</em> 2006;34:730–737 &nbsp;·&nbsp; For clinical decision support only.
 </div>
-
-</div><!-- /wrap -->
+</div>
 
 <script>
 const LI={'l-surgery':1,'l-tpn':1,'l-colonization':3,'l-sepsis':2};
@@ -327,34 +293,20 @@ const S={leon:{},modified:{}};
 
 function toggle(id,panel){
   const el=document.getElementById(id);
-  const on=el.classList.toggle('checked');
-  S[panel][id]=on;
+  S[panel][id]=el.classList.toggle('checked');
   recalc(panel);
 }
-
 function resetAll(){
   ['leon','modified'].forEach(p=>{
     S[p]={};
-    Object.keys(p==='leon'?LI:MI).forEach(id=>{
-      const el=document.getElementById(id);
-      if(el)el.classList.remove('checked');
-    });
+    Object.keys(p==='leon'?LI:MI).forEach(id=>{const el=document.getElementById(id);if(el)el.classList.remove('checked');});
     recalc(p);
   });
   document.getElementById('notes-leon').value='';
   document.getElementById('notes-mod').value='';
 }
-
-function lRisk(s){
-  if(s<3)return{c:'rl',l:'Low risk',i:'ti-circle'};
-  if(s<5)return{c:'rm',l:'Moderate risk',i:'ti-alert-triangle'};
-  return{c:'rh',l:'High risk',i:'ti-alert-circle'};
-}
-function mRisk(s){
-  if(s<4)return{c:'rl',l:'Low risk',i:'ti-circle'};
-  if(s<7)return{c:'rm',l:'Moderate risk',i:'ti-alert-triangle'};
-  return{c:'rh',l:'High risk',i:'ti-alert-circle'};
-}
+function lRisk(s){if(s<3)return{c:'rl',l:'Low risk',i:'ti-circle'};if(s<5)return{c:'rm',l:'Moderate risk',i:'ti-alert-triangle'};return{c:'rh',l:'High risk',i:'ti-alert-circle'};}
+function mRisk(s){if(s<4)return{c:'rl',l:'Low risk',i:'ti-circle'};if(s<7)return{c:'rm',l:'Moderate risk',i:'ti-alert-triangle'};return{c:'rh',l:'High risk',i:'ti-alert-circle'};}
 function lRec(s){
   if(s<3)return'Score &lt; 3 — invasive candidiasis unlikely. Antifungal prophylaxis not routinely indicated. Continue surveillance cultures and monitor clinical trajectory.';
   if(s<5)return'Score 3–4 — moderate probability. Consider empirical antifungal therapy. Fluconazole IV (400 mg load then 200–400 mg/day) for non-critically ill patients without prior azole exposure; fluconazole 800/400 mg if critically ill. Send blood cultures ×2. Reassess daily.';
@@ -365,37 +317,25 @@ function mRec(s){
   if(s<7)return'Score 4–6 — moderate probability. Empirical antifungal warranted. Fluconazole IV (400 mg load then 200–400 mg/day) for non-critically ill without prior azole exposure; echinocandin for critically ill or azole-exposed. Send blood cultures. Reassess at 72–96 h.';
   return'Score ≥ 7 — high probability. Initiate echinocandin empirically: caspofungin 70/50 mg/day or micafungin 100 mg/day. Escalate workup: blood cultures ×2, β-D-glucan, ophthalmology, echocardiogram. Target source control. Review at 5–7 days for de-escalation.';
 }
-
 function recalc(panel){
-  const items=panel==='leon'?LI:MI;
-  let tot=0;
+  const items=panel==='leon'?LI:MI;let tot=0;
   Object.keys(items).forEach(k=>{if(S[panel][k])tot+=items[k];});
-  const max=panel==='leon'?7:11;
-  const pct=Math.round(tot/max*100);
+  const max=panel==='leon'?7:11,pct=Math.round(tot/max*100);
   if(panel==='leon'){
     document.getElementById('leon-num').textContent=tot;
-    const r=lRisk(tot);
-    const re=document.getElementById('leon-risk');
-    re.className='rbadge '+r.c;
-    re.innerHTML=`<i class="ti ${r.i}"></i> ${r.l}`;
+    const r=lRisk(tot),re=document.getElementById('leon-risk');
+    re.className='rbadge '+r.c;re.innerHTML=`<i class="ti ${r.i}"></i> ${r.l}`;
     document.getElementById('leon-rec').innerHTML=lRec(tot);
-    const b=document.getElementById('leon-bar');
-    b.style.width=pct+'%';
-    b.className='bfill '+(tot<3?'bl':tot<5?'bm':'bh');
+    const b=document.getElementById('leon-bar');b.style.width=pct+'%';b.className='bfill '+(tot<3?'bl':tot<5?'bm':'bh');
   }else{
     document.getElementById('mod-num').textContent=tot;
-    const r=mRisk(tot);
-    const re=document.getElementById('mod-risk');
-    re.className='rbadge '+r.c;
-    re.innerHTML=`<i class="ti ${r.i}"></i> ${r.l}`;
+    const r=mRisk(tot),re=document.getElementById('mod-risk');
+    re.className='rbadge '+r.c;re.innerHTML=`<i class="ti ${r.i}"></i> ${r.l}`;
     document.getElementById('mod-rec').innerHTML=mRec(tot);
-    const b=document.getElementById('mod-bar');
-    b.style.width=pct+'%';
-    b.className='bfill '+(tot<4?'bl':tot<7?'bm':'bh');
+    const b=document.getElementById('mod-bar');b.style.width=pct+'%';b.className='bfill '+(tot<4?'bl':tot<7?'bm':'bh');
   }
   updateCompare();
 }
-
 function updateCompare(){
   let lt=0;Object.keys(LI).forEach(k=>{if(S.leon[k])lt+=LI[k];});
   let mt=0;Object.keys(MI).forEach(k=>{if(S.modified[k])mt+=MI[k];});
@@ -406,7 +346,6 @@ function updateCompare(){
   const mr=mRisk(mt),me=document.getElementById('cmp-mod-risk');
   me.className='rbadge '+mr.c;me.innerHTML=`<i class="ti ${mr.i}"></i> ${mr.l}`;
 }
-
 function switchTab(tab){
   const order=['leon','modified','compare'];
   document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',order[i]===tab));
@@ -414,42 +353,88 @@ function switchTab(tab){
   document.getElementById('panel-'+tab).classList.add('active');
 }
 
+/* ── PWA Install ── */
+let dProm=null;
+const ua=navigator.userAgent;
+const isIos=/iphone|ipad|ipod/i.test(ua);
+const isSamsung=/SamsungBrowser/i.test(ua);
+const isFirefox=/Firefox/i.test(ua);
+const isChrome=/Chrome/i.test(ua)&&!/Edg/i.test(ua);
+const isStandalone=window.matchMedia('(display-mode:standalone)').matches||navigator.standalone;
+
+// Hide install button if already installed
+if(isStandalone)document.getElementById('add-btn').classList.add('hidden');
+
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault();dProm=e;
+});
+
+function showInstallModal(){
+  const overlay=document.getElementById('modal-overlay');
+  const instBtn=document.getElementById('modal-inst-btn');
+  const divider=document.getElementById('modal-divider');
+  const steps=document.getElementById('modal-steps');
+
+  // If native prompt available → show one-tap button
+  if(dProm){
+    instBtn.classList.remove('hidden');
+    divider.classList.remove('hidden');
+  }
+
+  // Build step-by-step instructions based on browser
+  let html='';
+  if(isIos){
+    document.getElementById('modal-title').textContent='Add to Home Screen (iOS)';
+    html=`
+      <div class="inst-step"><div class="inst-num">1</div><div class="inst-step-text">Tap the <strong>Share</strong> button <span class="inst-icon"><i class="ti ti-share" style="font-size:13px"></i></span> at the bottom of Safari</div></div>
+      <div class="inst-step"><div class="inst-num">2</div><div class="inst-step-text">Scroll down and tap <strong>"Add to Home Screen"</strong></div></div>
+      <div class="inst-step"><div class="inst-num">3</div><div class="inst-step-text">Tap <strong>Add</strong> in the top right corner</div></div>`;
+  }else if(isSamsung){
+    document.getElementById('modal-title').textContent='Add to Home Screen (Samsung)';
+    html=`
+      <div class="inst-step"><div class="inst-num">1</div><div class="inst-step-text">Tap the <strong>menu</strong> button <span class="inst-icon">⋮</span> at the bottom of the browser</div></div>
+      <div class="inst-step"><div class="inst-num">2</div><div class="inst-step-text">Tap <strong>"Add page to"</strong> then <strong>"Home screen"</strong></div></div>
+      <div class="inst-step"><div class="inst-num">3</div><div class="inst-step-text">Tap <strong>Add</strong> to confirm</div></div>`;
+  }else if(isChrome){
+    document.getElementById('modal-title').textContent='Add to Home Screen (Chrome)';
+    html=`
+      <div class="inst-step"><div class="inst-num">1</div><div class="inst-step-text">Tap the <strong>menu</strong> <span class="inst-icon">⋮</span> in the top-right corner</div></div>
+      <div class="inst-step"><div class="inst-num">2</div><div class="inst-step-text">Tap <strong>"Add to Home screen"</strong> or <strong>"Install app"</strong></div></div>
+      <div class="inst-step"><div class="inst-num">3</div><div class="inst-step-text">Tap <strong>Add</strong> to confirm</div></div>`;
+  }else{
+    document.getElementById('modal-title').textContent='Add to Home Screen';
+    html=`
+      <div class="inst-step"><div class="inst-num">1</div><div class="inst-step-text">Open the browser <strong>menu</strong> (usually ⋮ or ···)</div></div>
+      <div class="inst-step"><div class="inst-num">2</div><div class="inst-step-text">Look for <strong>"Add to Home screen"</strong> or <strong>"Install app"</strong></div></div>
+      <div class="inst-step"><div class="inst-num">3</div><div class="inst-step-text">Tap <strong>Add</strong> to confirm</div></div>`;
+  }
+  steps.innerHTML=html;
+  overlay.classList.add('show');
+  document.body.style.overflow='hidden';
+}
+
+function closeModal(){
+  document.getElementById('modal-overlay').classList.remove('show');
+  document.body.style.overflow='';
+}
+function closeModalOutside(e){if(e.target===document.getElementById('modal-overlay'))closeModal();}
+
+function doInstall(){
+  if(!dProm)return;
+  closeModal();
+  dProm.prompt();
+  dProm.userChoice.then(()=>{dProm=null;});
+}
+
+window.addEventListener('appinstalled',()=>{
+  document.getElementById('add-btn').classList.add('hidden');
+  closeModal();
+});
+
 /* ── Service Worker ── */
 if('serviceWorker'in navigator){
   window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
 }
-
-/* ── PWA Install ── */
-let dProm=null;
-function isIos(){return/iphone|ipad|ipod/i.test(navigator.userAgent)&&!window.MSStream;}
-function isStandalone(){return window.matchMedia('(display-mode:standalone)').matches||navigator.standalone;}
-
-window.addEventListener('beforeinstallprompt',e=>{
-  e.preventDefault();dProm=e;
-  if(!sessionStorage.getItem('instDismissed'))
-    document.getElementById('install-banner').classList.add('show');
-});
-function doInstall(){
-  if(!dProm)return;
-  dProm.prompt();
-  dProm.userChoice.then(()=>{dProm=null;document.getElementById('install-banner').classList.remove('show');});
-}
-function dismissInstall(){
-  sessionStorage.setItem('instDismissed','1');
-  document.getElementById('install-banner').classList.remove('show');
-}
-function dismissIos(){
-  sessionStorage.setItem('iosDism','1');
-  document.getElementById('ios-hint').classList.remove('show');
-}
-window.addEventListener('load',()=>{
-  if(isIos()&&!isStandalone()&&!sessionStorage.getItem('iosDism'))
-    document.getElementById('ios-hint').classList.add('show');
-});
-window.addEventListener('appinstalled',()=>{
-  document.getElementById('install-banner').classList.remove('show');
-  document.getElementById('ios-hint').classList.remove('show');
-});
 </script>
 </body>
 </html>
