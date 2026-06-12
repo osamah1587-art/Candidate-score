@@ -2,7 +2,7 @@
   "name": "Candida Score Calculator",
   "short_name": "Candida Score",
   "description": "ICU Candida Score — Leon 2006 and modified expanded versions with antifungal recommendations",
-  "start_url": "/candida-score/",
+  "start_url": "./",
   "display": "standalone",
   "background_color": "#F8F9FA",
   "theme_color": "#0F6E56",
