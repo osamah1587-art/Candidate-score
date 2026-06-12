@@ -359,7 +359,8 @@ const ua=navigator.userAgent;
 const isIos=/iphone|ipad|ipod/i.test(ua);
 const isSamsung=/SamsungBrowser/i.test(ua);
 const isFirefox=/Firefox/i.test(ua);
-const isChrome=/Chrome/i.test(ua)&&!/Edg/i.test(ua);
+const isEdge=/Edg/i.test(ua);
+const isChrome=/Chrome/i.test(ua)&&!isEdge;
 const isStandalone=window.matchMedia('(display-mode:standalone)').matches||navigator.standalone;
 
 // Hide install button if already installed
@@ -394,6 +395,12 @@ function showInstallModal(){
     html=`
       <div class="inst-step"><div class="inst-num">1</div><div class="inst-step-text">Tap the <strong>menu</strong> button <span class="inst-icon">⋮</span> at the bottom of the browser</div></div>
       <div class="inst-step"><div class="inst-num">2</div><div class="inst-step-text">Tap <strong>"Add page to"</strong> then <strong>"Home screen"</strong></div></div>
+      <div class="inst-step"><div class="inst-num">3</div><div class="inst-step-text">Tap <strong>Add</strong> to confirm</div></div>`;
+  }else if(isEdge){
+    document.getElementById('modal-title').textContent='Add to Home Screen (Edge)';
+    html=`
+      <div class="inst-step"><div class="inst-num">1</div><div class="inst-step-text">Tap the <strong>menu</strong> <span class="inst-icon">···</span> at the bottom of the screen</div></div>
+      <div class="inst-step"><div class="inst-num">2</div><div class="inst-step-text">Tap <strong>"Add to phone"</strong> or <strong>"Add to Home screen"</strong></div></div>
       <div class="inst-step"><div class="inst-num">3</div><div class="inst-step-text">Tap <strong>Add</strong> to confirm</div></div>`;
   }else if(isChrome){
     document.getElementById('modal-title').textContent='Add to Home Screen (Chrome)';
